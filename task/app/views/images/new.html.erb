@@ -1,0 +1,26 @@
+<div class="image-form">
+  <%= form_for @image, :html => {:multipart => true} do |f| %>
+    <% if @image.errors.any? %>
+      <div class="error_messages signing-error">
+        <ul>
+          <% for message in @image.errors.full_messages %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <p>
+      <%= f.label :description %>
+      <%= f.text_field :description %>
+    </p>
+  
+    <p>
+      <%= f.label :image %>
+      <%= f.file_field :image, :class => "textbox-a", :placeholder => "Image File" %>
+    </p>
+    <p>
+      <%= f.submit "Upload Image", :class => "btn-a" %>
+    </p>
+  <% end %>
+</div>

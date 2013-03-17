@@ -1,0 +1,10 @@
+source 'http://rubygems.org'
+
+gem 'sinatra'
+gem 'bunny'
+gem 'datamapper'
+gem 'carrierwave-datamapper'
+gem 'mini_magick'
+
+gem 'dm-mysql-adapter'
+gem 'data_mapper'

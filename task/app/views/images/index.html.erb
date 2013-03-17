@@ -1,0 +1,13 @@
+<% if signed_in? %>
+    <p><%= link_to "uploade image", new_image_path %></p>
+<% end %>
+<h1>Image Overview</h1>
+
+<div id="images">
+    <% @images.each do |image| %>
+        <div>
+            <p><%= image_tag image.thumb_url %></p>
+            <p><%= image.description %></p>
+        </div>
+    <% end %>
+</div>
