@@ -6,7 +6,6 @@ require 'sinatra'
 require 'bunny'
 require 'json'
 require 'carrierwave/datamapper'
-require 'mini_magick'
 require 'carrierwave/processing/rmagick'
 require 'logger'
 
@@ -27,6 +26,12 @@ class Image
   property :user_id, Serial
   property :description, String
   property :thumb_url, String
+
+  def save_thumb_url thumb_image_url
+    self.thumb_url = thumb_image_url
+    self.save
+    self
+  end
 end
 DataMapper.auto_upgrade!
 
@@ -49,21 +54,9 @@ end
 def self.node_exchange
     @node_exchange ||= client.exchange('')
 end
+##########################################
 
-get_images_queue.subscribe(:ack => true) do |msg|
-  Dir.chdir("../")
-  @@current_dir ||= Dir.pwd
-  json_string = JSON.parse(msg[:payload])
-puts @current_dir
-  image_path = json_string['image_path']
-  image_file = json_string['image_file']
-  image_id = json_string['image_id']
-  thumb_image = image_path+"thumb_"+image_file
-  @image = Image.first(:id => image_id)
-  @image.thumb_url = thumb_image
-  @image.save
-
-  file = @@current_dir+"/task/public"+image_path+image_file 
+def self.process_thumb file, image_path, image_file
   (1..10).each do 
     if File.exists?(file)
       image = Magick::ImageList.new(@@current_dir+"/task/public"+image_path+image_file)
@@ -75,8 +68,21 @@ puts @current_dir
       sleep(1)
     end
   end
+end
 
-  node_exchange.publish "<p><img src="+image_path+"thumb_"+image_file+" /></p><p>"+@image.description+"</p>", :key => "image_upload"
+get_images_queue.subscribe(:ack => true) do |msg|
+  Dir.chdir("../")
+  @@current_dir ||= Dir.pwd
 
+  img = JSON.parse(msg[:payload])
+  thumb_image = img['image_path']+"thumb_"+img['image_file']
+
+  file = @@current_dir+"/task/public"+img['image_path']+img['image_file']
+
+  @image = Image.first(:id => img['image_id']).save_thumb_url thumb_image
+
+  process_thumb file, img['image_path'], img['image_file']
+
+  node_exchange.publish "<p><img src="+img['image_path']+"thumb_"+img['image_file']+" /></p><p>"+@image.description+"</p>", :key => "image_upload"
   puts "sent img to node.js"
 end

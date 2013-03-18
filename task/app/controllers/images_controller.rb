@@ -27,7 +27,6 @@ class ImagesController < ApplicationController
 
     def show
         @image = Image.find(params[:id])
-        #ImagesController.send_image.publish "string", :key => "image_upload"    
     end
 
     def new
