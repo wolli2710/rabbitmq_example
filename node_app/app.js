@@ -13,7 +13,7 @@ connection.on('ready', function(){
 
       q.subscribe(function (message) {
         console.log("image")
-        io.sockets.emit('image_upload', message.data.toString())
+        socket.broadcast.emit('image_upload', message.data.toString())
       });
     });
   });

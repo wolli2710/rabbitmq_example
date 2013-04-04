@@ -17,7 +17,7 @@ class ImagesController < ApplicationController
     end
 
     def self.send_image
-      @send_image ||= client.exchange('')
+      @send_image ||= client.exchange('', :durable => true)
     end
 ######################################
 

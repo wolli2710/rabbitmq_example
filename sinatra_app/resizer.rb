@@ -48,11 +48,11 @@ def self.client
 end
 
 def self.get_images_queue
-    @get_images ||= client.queue("images")
+    @get_images ||= client.queue("images", :durable => true)
 end
 
 def self.node_exchange
-    @node_exchange ||= client.exchange('')
+    @node_exchange ||= client.exchange('', :durable => true)
 end
 ##########################################
 
